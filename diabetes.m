@@ -34,31 +34,90 @@ impractical = [sum(g) sum(st) sum(bp) sum(i) sum(bmi) sum(dpf) sum(age)];
 
 %replace 0 mean of benign and malignant%
 
+g=(dataTrain.Glucose==0);
+msa=(dataTrain.Outcome==1);
+ks=mean(dataTrain.Glucose(~g & msa));
+dataTrain.Glucose(g & msa)=ks;
+ks=mean(dataTrain.Glucose(~g & ~msa));
+dataTrain.Glucose(g & ~msa)=ks;
+g=(dataTrain.BloodPressure==0);
+ks=mean(dataTrain.BloodPressure(~g & msa));
+dataTrain.BloodPressure(g & msa)=ks;
+ks=mean(dataTrain.BloodPressure(~g & ~msa));
+dataTrain.BloodPressure(g & ~msa)=ks;
+g=(dataTrain.SkinThickness==0);
+ks=mean(dataTrain.SkinThickness(~g & msa));
+dataTrain.SkinThickness(g & msa)=ks;
+ks=mean(dataTrain.SkinThickness(~g & ~msa));
+dataTrain.SkinThickness(g & ~msa)=ks;
+g=(dataTrain.Insulin==0);
+ks=mean(dataTrain.Insulin(~g & msa));
+dataTrain.Insulin(g & msa)=ks;
+ks=mean(dataTrain.Insulin(~g & ~msa));
+dataTrain.Insulin(g & ~msa)=ks;
+g=(dataTrain.BMI==0);
+ks=mean(dataTrain.BMI(~g & msa));
+dataTrain.BMI(g & msa)=ks;
+ks=mean(dataTrain.BMI(~g & ~msa));
+dataTrain.BMI(g & ~msa)=ks;
+g=(dataTrain.DiabetesPedigreeFunction==0);
+ks=mean(dataTrain.DiabetesPedigreeFunction(~g & msa));
+dataTrain.DiabetesPedigreeFunction(g & msa)=ks;
+ks=mean(dataTrain.DiabetesPedigreeFunction(~g & ~msa));
+dataTrain.DiabetesPedigreeFunction(g & ~msa)=ks;
+dataTrain.Age(p)=mean(dataTrain.Age(~p));
+%%
+%Handle the 0 values for some features of test set
+g=(dataTest.Glucose==0);
+k=(dataTest.BloodPressure==0);
+l=(dataTest.SkinThickness==0);
+m=(dataTest.Insulin==0);
+n=(dataTest.BMI==0);
+o=(dataTest.DiabetesPedigreeFunction==0);
+p=(dataTest.Age==0);
+impractical=[sum(g) sum(k) sum(l) sum(m) sum(n) sum(o) sum(p)];
+%%
+%Replace those with average of the corresponding columns of test data
+g=(dataTest.Glucose==0);
+msa=(dataTest.Outcome==1);
+ks=mean(dataTest.Glucose(~g & msa));
+dataTest.Glucose(g & msa)=ks;
+ks=mean(dataTest.Glucose(~g & ~msa));
+dataTest.Glucose(g & ~msa)=ks;
+g=(dataTest.BloodPressure==0);
+ks=mean(dataTest.BloodPressure(~g & msa));
+dataTest.BloodPressure(g & msa)=ks;
+ks=mean(dataTest.BloodPressure(~g & ~msa));
+dataTest.BloodPressure(g & ~msa)=ks;
+g=(dataTest.SkinThickness==0);
+ks=mean(dataTest.SkinThickness(~g & msa));
+dataTest.SkinThickness(g & msa)=ks;
+ks=mean(dataTest.SkinThickness(~g & ~msa));
+dataTest.SkinThickness(g & ~msa)=ks;
+g=(dataTest.Insulin==0);
+ks=mean(dataTest.Insulin(~g & msa));
+dataTest.Insulin(g & msa)=ks;
+ks=mean(dataTest.Insulin(~g & ~msa));
+dataTest.Insulin(g & ~msa)=ks;
+g=(dataTest.BMI==0);
+ks=mean(dataTest.BMI(~g & msa));
+dataTest.BMI(g & msa)=ks;
+ks=mean(dataTest.BMI(~g & ~msa));
+dataTest.BMI(g & ~msa)=ks;
+g=(dataTest.DiabetesPedigreeFunction==0);
+ks=mean(dataTest.DiabetesPedigreeFunction(~g & msa));
+dataTest.DiabetesPedigreeFunction(g & msa)=ks;
+ks=mean(dataTest.DiabetesPedigreeFunction(~g & ~msa));
+dataTest.DiabetesPedigreeFunction(g & ~msa)=ks;
+dataTest.Age(p)=mean(dataTest.Age(~p));
+%%
 
-%define sigmoid function%
-function g = sigmoid(z)
-
-g = zeros(size(z));
-
-
-
-g= 1./(1+ exp(-z));
-
-%cost function%
-
-
-
-function [J, grad] = costFunction(theta, X, y)
-
-m = length(y); %no of rows%
-
-J = 0;
-grad = zeros(size(theta));
-
-J = (1 / m) * sum( -y'*log(sigmoid(X*theta)) - (1-y)'*log( 1 - sigmoid(X*theta)) );
-
-grad = (1 / m) * sum( X .* repmat((sigmoid(X*theta) - y), 1, size(X,2)) );
-
-
-
+%Train model using training sets
+classification_model=fitcsvm(dataTrain,'Outcome~Pregnancies+Glucose+BloodPressure+SkinThickness+Insulin+BMI+DiabetesPedigreeFunction+Age');
+%%
+%Accuracy
+gs=dataTest(:,1:8); %as 9th column is outcome%
+mk=predict(classification_model,gs);
+accurancy_check=((sum((mk==table2array(dataTest(:,9)))))/size(dataTest,1))*100;
+disp(accurancy_check);
 
